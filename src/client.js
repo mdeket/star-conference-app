@@ -4,8 +4,22 @@ const url = 'ws://192.168.1.105:8080';
 const connection = new WebSocket(url);
 let myChart;
 
+function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+if (!localStorage.getItem('id')) {
+    console.log('No ID found.');
+    let id = uuidv4();
+    console.log(id);
+    localStorage.setItem('id', id);
+}
+
 connection.onopen = () => {
-    connection.send('hey')
+    // connection.send('hey')
 };
 
 connection.onerror = (error) => {
@@ -18,19 +32,19 @@ connection.onmessage = (e) => {
     let fails = response.fails;
     myChart.data.datasets[0].data[0] = success;
     myChart.data.datasets[0].data[1] = fails;
-    if(success >= fails && success > myChart.options.scales.yAxes[0].ticks.max) {
+    if (success >= fails && success > myChart.options.scales.yAxes[0].ticks.max) {
         myChart.options.scales.yAxes[0].ticks.max = success + 5;
     }
 
-    if(success < fails && fails > myChart.options.scales.yAxes[0].ticks.max) {
+    if (success < fails && fails > myChart.options.scales.yAxes[0].ticks.max) {
         myChart.options.scales.yAxes[0].ticks.max = fails + 5;
     }
 
     myChart.update();
 };
 
-sendMessage = (data) => {
-    connection.send(data);
+sendMessage = (vote, id) => {
+    connection.send(JSON.stringify({vote, id}));
 };
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -40,10 +54,16 @@ document.addEventListener("DOMContentLoaded", function () {
     Chart.defaults.global.defaultFontColor = 'white';
 
     let success = document.getElementById("succeeded");
-    success.addEventListener("click", () => sendMessage(1));
+    success.addEventListener("click", () => {
+        localStorage.setItem('voted', "success");
+        sendMessage(1, localStorage.getItem('id'));
+    });
 
     let fail = document.getElementById("failed");
-    fail.addEventListener("click", () => sendMessage(0));
+    fail.addEventListener("click", () => {
+        localStorage.setItem('voted', "fail");
+        sendMessage(0, localStorage.getItem('id'));
+    });
 
     let ctx = document.getElementById('bar-chart');
     myChart = new Chart(ctx, {
