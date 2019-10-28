@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Star Conference</title>
-  <meta charset="utf-8">
-  <link rel="shortcut icon" type="image/png" href="https://www.vegaitsourcing.rs/favicon.ico"/>
-  <script src="client.js" defer></script>
-  <link rel="stylesheet" href="style.css">
+    <title>Star Conference</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/png" href="https://www.vegaitsourcing.rs/favicon.ico"/>
+    <script src="client.js" defer></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>Welcome to Star Conference 2019!</h1>
+<div>
+    <h2>Star Conference 2019!</h2>
 
-<h2 style="margin-bottom: 60px">My Startup Story: Fail or Success? You Get to Decide.</h2>
-<button id="succeeded" class="btn third">Succeeded</button>
-<button id="failed" class="btn third">Failed</button>
-
-<canvas id="bar-chart" height="200" style="max-height: 350px"></canvas>
-
+    <h1>My Startup Story: Fail or Success? <br>You Get to Decide.</h1>
+</div>
+<div class="voteButtonContainer">
+    <div id="succeeded" class="btn third voteButton">Succeeded</div>
+    <div id="failed" class="btn third voteButton">Failed</div>
+</div>
+<canvas id="bar-chart" height="200" class="chart"></canvas>
+<div>
+    <p id="lastVote">You didn't vote yet!</p>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
-
 </body>
 </html>

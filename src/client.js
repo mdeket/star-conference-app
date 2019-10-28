@@ -3,6 +3,8 @@
 const url = 'ws://192.168.1.105:8080';
 const connection = new WebSocket(url);
 let myChart;
+let voteCounter = 0;
+
 
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -16,6 +18,14 @@ if (!localStorage.getItem('id')) {
     let id = uuidv4();
     console.log(id);
     localStorage.setItem('id', id);
+}
+
+if (localStorage.getItem("voted")) {
+    if (localStorage.getItem("voted") === "success") {
+        document.getElementById("lastVote").innerHTML = "You voted: Succeeded";
+    } else {
+        document.getElementById("lastVote").innerHTML = "You voted: Failed";
+    }
 }
 
 connection.onopen = () => {
@@ -47,23 +57,39 @@ sendMessage = (vote, id) => {
     connection.send(JSON.stringify({vote, id}));
 };
 
+function justVoted() {
+
+    voteCounter += 1;
+    let interval = setInterval(function () {
+        if (voteCounter >= 3) {
+            voteCounter = 0;
+            location.href = 'https://i1.wp.com/picsmine.com/wp-content/uploads/2017/04/Please-just-stop-Stop-Meme.jpg?resize=400%2C400';
+        }
+        voteCounter = 0;
+        clearInterval(interval);
+    }, 1000);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     console.log('Your document is ready!');
 
-
     Chart.defaults.global.defaultFontColor = 'white';
-
     let success = document.getElementById("succeeded");
     success.addEventListener("click", () => {
+        justVoted();
         localStorage.setItem('voted', "success");
+        document.getElementById("lastVote").innerHTML = "You voted: Succeeded";
         sendMessage(1, localStorage.getItem('id'));
     });
 
     let fail = document.getElementById("failed");
     fail.addEventListener("click", () => {
+        justVoted();
         localStorage.setItem('voted', "fail");
+        document.getElementById("lastVote").innerHTML = "You voted: Failed";
         sendMessage(0, localStorage.getItem('id'));
     });
+
 
     let ctx = document.getElementById('bar-chart');
     myChart = new Chart(ctx, {
@@ -84,7 +110,6 @@ document.addEventListener("DOMContentLoaded", function () {
             legend: {
                 position: 'bottom',
                 labels: {
-                    // This more specific font property overrides the global property
                     fontColor: 'white',
                     defaultFontFamily: 'Montserrat'
                 }

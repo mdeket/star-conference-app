@@ -66,5 +66,5 @@ wss.on('connection', (ws) => {
 });
 
 connect().use(serveStatic(__dirname)).listen(8081, function () {
-    console.log('Server running on 8080...');
+    console.log('Server running on 8081...');
 });
