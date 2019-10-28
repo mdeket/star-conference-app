@@ -1,6 +1,7 @@
 // const Chart = require('chart.js');
 
-const url = 'ws://192.168.1.105:8080';
+const url = 'ws://starapp.localtunnel.me';
+// const url = 'ws://starapp.localtunnel.me:8080';
 const connection = new WebSocket(url);
 let myChart;
 let voteCounter = 0;
