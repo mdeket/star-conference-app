@@ -1,11 +1,6 @@
-// const Chart = require('chart.js');
-
-const url = 'ws://starapp.localtunnel.me';
-// const url = 'ws://starapp.localtunnel.me:8080';
-const connection = new WebSocket(url);
+let socket = io.connect('http://192.168.65.183:3000');
 let myChart;
 let voteCounter = 0;
-
 
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -29,16 +24,14 @@ if (localStorage.getItem("voted")) {
     }
 }
 
-connection.onopen = () => {
-    // connection.send('hey')
+sendMessage = (vote, id) => {
+    // connection.send(JSON.stringify());
+    socket.emit('vote', {vote, id});
 };
 
-connection.onerror = (error) => {
-    console.log(`WebSocket error: ${error}`)
-};
-
-connection.onmessage = (e) => {
-    let response = JSON.parse(e.data);
+socket.on('recorded', (e) => {
+    console.log(e);
+    let response = e;
     let success = response.successes;
     let fails = response.fails;
     myChart.data.datasets[0].data[0] = success;
@@ -52,11 +45,8 @@ connection.onmessage = (e) => {
     }
 
     myChart.update();
-};
+});
 
-sendMessage = (vote, id) => {
-    connection.send(JSON.stringify({vote, id}));
-};
 
 function justVoted() {
 
@@ -90,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("lastVote").innerHTML = "You voted: Failed";
         sendMessage(0, localStorage.getItem('id'));
     });
+
 
 
     let ctx = document.getElementById('bar-chart');

@@ -1,8 +1,5 @@
-const WebSocket = require('ws');
-const connect = require('connect');
-const serveStatic = require('serve-static');
-
-const wss = new WebSocket.Server({port: 8080});
+const server = require('http').createServer();
+const io = require('socket.io')(server);
 
 let successes = 0;
 let fails = 0;
@@ -24,7 +21,7 @@ function addVote(data) {
             } else if (data.vote === 0) {
                 fails += 1;
             }
-
+            io.sockets.emit('recorded', {successes, fails});
             // Update vote
             votes[i] = data;
             return true;
@@ -40,31 +37,25 @@ function addVote(data) {
 
     // Update vote
     votes.push(data);
+    io.sockets.emit('recorded', {successes, fails});
     return true;
 
 }
 
-wss.on('connection', (ws) => {
-    ws.on('message', (message) => {
-        console.log(message);
-        let data = JSON.parse(message);
+io.sockets.on('connection', client => {
+    console.log('CONNECTED');
+
+    client.emit('recorded', {successes, fails});
+
+
+    client.on('vote', data1 => {
+        console.log(data1);
+        let data = data1;
 
         console.log(JSON.stringify({successes, fails}));
         addVote(data);
 
-        wss.clients.forEach(function each(client) {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify({successes, fails}));
-            }
-        });
-    });
-    wss.clients.forEach(function each(client) {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({successes, fails}));
-        }
+        client.emit('recorded', {successes, fails});
     });
 });
-
-connect().use(serveStatic(__dirname)).listen(8081, function () {
-    console.log('Server running on 8081...');
-});
+server.listen(3000);
