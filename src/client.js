@@ -1,4 +1,4 @@
-let socket = io.connect('http://192.168.65.183:3000');
+let socket = io.connect('http://ec2-54-202-77-177.us-west-2.compute.amazonaws.com');
 let myChart;
 let voteCounter = 0;
 
